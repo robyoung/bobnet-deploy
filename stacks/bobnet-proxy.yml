@@ -1,0 +1,14 @@
+version: "3"
+services:
+  proxy:
+    image: robyoung/bobnet-proxy:latest
+    volumes:
+      - "/etc/tls:/etc/tls:ro"
+    ports:
+      - "443:443"
+      - "80:80"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role == dmz
+
