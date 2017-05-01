@@ -7,6 +7,7 @@ services:
     ports:
       - "443:443"
       - "80:80"
+      - "5005:5005"
     deploy:
       placement:
         constraints:
