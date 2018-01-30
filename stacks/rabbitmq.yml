@@ -1,0 +1,23 @@
+version: "3.5"
+services:
+  rabbitmq:
+    image: robyoung/rabbitmq:002
+    ports:
+      - "1883:1883"  # MQTT non-ssl
+      - "15672:15672"  # UI non-ssl
+
+      - "8883:8883"
+      - "15671:15671"
+      - "5672:5672"
+      - "5671:5671"
+    networks:
+      - rabbitmq
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role == dmz
+
+networks:
+  rabbitmq:
+    driver: overlay
+    attachable: true
