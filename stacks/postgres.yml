@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.5"
 services:
   postgres:
     image: arm32v7/postgres:10
@@ -12,14 +12,13 @@ services:
         constraints:
           - node.labels.role == data
     networks:
-      - postgres
+      - bobnet-data
     secrets:
       - pg_password
 
 networks:
-  postgres:
-    driver: overlay
-    attachable: true
+  bobnet-data:
+    external: true
 
 secrets:
   pg_password:

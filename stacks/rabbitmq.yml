@@ -2,22 +2,28 @@ version: "3.5"
 services:
   rabbitmq:
     image: robyoung/rabbitmq:002
+    environment:
+      RABBITMQ_DEFAULT_USER=rabbit
+      RABBITMQ_DEFAULT_PASS_FILE=/run/secrets/rabbit_password
     ports:
-      - "1883:1883"  # MQTT non-ssl
-      - "15672:15672"  # UI non-ssl
+      - "1883:1883"    # MQTT non-TLS
+      - "15672:15672"  # UI non-TLS
+      - "5672:5672"    # AMQP non-TLS
 
-      - "8883:8883"
-      - "15671:15671"
-      - "5672:5672"
-      - "5671:5671"
+      # - "8883:8883"    # MQTT TLS
+      # - "15671:15671"  # UI TLS
+      # - "5671:5671"    # AMQP TLS
     networks:
-      - rabbitmq
+      - bobnet-messaging
     deploy:
       placement:
         constraints:
           - node.labels.role == dmz
 
 networks:
-  rabbitmq:
-    driver: overlay
-    attachable: true
+  bobnet-messaging:
+    external: true
+
+secrets:
+  rabbit_password:
+    external: true
