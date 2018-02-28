@@ -6,6 +6,7 @@ services:
       - "/mnt/data/postgres:/var/lib/postgresql/data/pgdata"
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD_FILE=/run/secrets/pg_password
     deploy:
       placement:
@@ -15,6 +16,10 @@ services:
       - bobnet-data
     secrets:
       - pg_password
+    configs:
+      - source: init_databases
+        target: /docker-entrypoint-initdb.d/init-databases.sh
+        mode: 07555
 
 networks:
   bobnet-data:
@@ -23,3 +28,7 @@ networks:
 secrets:
   pg_password:
     external: true
+
+configs:
+  init_databases:
+    file: ./configs/postgres/init_databases.sh
