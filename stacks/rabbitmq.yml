@@ -3,8 +3,8 @@ services:
   rabbitmq:
     image: robyoung/rabbitmq:002
     environment:
-      RABBITMQ_DEFAULT_USER=rabbit
-      RABBITMQ_DEFAULT_PASS_FILE=/run/secrets/rabbit_password
+      - RABBITMQ_DEFAULT_USER=rabbit
+      - RABBITMQ_DEFAULT_PASS_FILE=/run/secrets/rabbit_password
     ports:
       - "1883:1883"    # MQTT non-TLS
       - "15672:15672"  # UI non-TLS
@@ -15,6 +15,8 @@ services:
       # - "5671:5671"    # AMQP TLS
     networks:
       - bobnet-messaging
+    secrets:
+      - rabbit_password
     deploy:
       placement:
         constraints:
