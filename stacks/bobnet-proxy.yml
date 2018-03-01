@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   proxy:
-    image: robyoung/bobnet-proxy:006
+    image: robyoung/bobnet-proxy:012
     volumes:
       - "/etc/tls:/etc/tls:ro"
     ports:
@@ -13,8 +13,11 @@ services:
           - node.labels.role == dmz
     networks:
       - bobnet-ingress
+      - bobnet-messaging
     secrets:
       - bobnet-ca.pem
+      - bobnet-local-fullchain
+      - bobnet-local-privkey
 
 networks:
   bobnet-ingress:
@@ -25,4 +28,10 @@ networks:
 
 secrets:
   bobnet-ca.pem:
+    external: true
+
+  bobnet-local-fullchain:
+    external: true
+
+  bobnet-local-privkey:
     external: true
