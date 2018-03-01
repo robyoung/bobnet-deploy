@@ -1,0 +1,66 @@
+version: "3.5"
+
+services:
+  web:
+    image: robyoung/bobnet-control:008
+    command: ./scripts/run_web.sh
+    environment:
+      - DB_NAME=bobnet_control
+      - DB_USER=postgres
+      - DB_PASSWORD_FILE=/run/secrets/pg_password
+      - DB_HOST=postgres.bobnet-data
+      - MESSAGING_HOST=rabbitmq.bobnet-messaging
+      - MESSAGING_USER=rabbit
+      - MESSAGING_PASS_FILE=/run/secrets/rabbit_password
+    networks:
+      - bobnet-data
+      - bobnet-ingress
+      - bobnet-messaging
+    secrets:
+      - pg_password
+      - rabbit_password
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role != dmz
+          - node.labels.role != data
+
+  messaging:
+    image: robyoung/bobnet-control:008
+    command: ./scripts/run_messaging.sh
+    environment:
+      - DB_NAME=bobnet_control
+      - DB_USER=postgres
+      - DB_PASSWORD_FILE=/run/secrets/pg_password
+      - DB_HOST=postgres.bobnet-data
+      - MESSAGING_HOST=rabbitmq.bobnet-messaging
+      - MESSAGING_USER=rabbit
+      - MESSAGING_PASS_FILE=/run/secrets/rabbit_password
+    networks:
+      - bobnet-data
+      - bobnet-messaging
+    secrets:
+      - pg_password
+      - rabbit_password
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role != dmz
+          - node.labels.role != data
+
+networks:
+  bobnet-data:
+    external: true
+
+  bobnet-ingress:
+    external: true
+
+  bobnet-messaging:
+    external: true
+
+secrets:
+  pg_password:
+    external: true
+
+  rabbit_password:
+    external: true
