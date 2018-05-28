@@ -21,6 +21,21 @@ services:
       placement:
         constraints:
           - node.labels.role == dmz
+  setup:
+    image: robyoung/rabbitmq-setup:001
+    networks:
+      - bobnet-messaging
+    secrets:
+      - rabbit_password
+      - devices_password
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role == dmz
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
 
 networks:
   bobnet-messaging:
@@ -28,4 +43,7 @@ networks:
 
 secrets:
   rabbit_password:
+    external: true
+
+  devices_password:
     external: true
