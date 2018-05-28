@@ -19,7 +19,7 @@ services:
     configs:
       - source: init_databases
         target: /docker-entrypoint-initdb.d/init-databases.sh
-        mode: 07555
+        mode: 0755
 
 networks:
   bobnet-data:
