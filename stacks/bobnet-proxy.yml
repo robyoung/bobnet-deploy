@@ -1,9 +1,9 @@
 version: "3.5"
 services:
   proxy:
-    image: robyoung/bobnet-proxy:016
-    volumes:
-      - "/etc/tls:/etc/tls:ro"
+    image: robyoung/bobnet-proxy:021
+    environment:
+      - BUMPER=1
     ports:
       - "443:443"
       - "80:80"
@@ -20,6 +20,10 @@ services:
       - bobnet-ca.pem
       - bobnet-local-fullchain
       - bobnet-local-privkey
+      - source: bobnet-fullchain-0001
+        target: bobnet-fullchain
+      - source: bobnet-privkey-0001
+        target: bobnet-privkey
 
 networks:
   bobnet-ingress:
@@ -36,4 +40,10 @@ secrets:
     external: true
 
   bobnet-local-privkey:
+    external: true
+
+  bobnet-fullchain-0001:
+    external: true
+
+  bobnet-privkey-0001:
     external: true

@@ -1,0 +1,89 @@
+version: "3.5"
+
+services:
+  web:
+    image: robyoung/mind:004
+    command: ./run.sh
+    environment:
+      - DB_NAME=mind
+      - DB_USER=mind
+      - DB_PASSWORD_FILE=/run/secrets/pg_mind_password
+      - DB_HOST=postgres.bobnet-data
+      - FLASK_APP=application.py
+      - ENVIRONMENT=prod
+      - SECRET_KEY_FILE=/run/secrets/mind-secret-key
+      - EMAIL_HASH_SALT_FILE=/run/secrets/mind-email-hash-salt
+      - GOOGLE_CONSUMER_KEY_FILE=/run/secrets/google_consumer_key
+      - GOOGLE_CONSUMER_SECRET_FILE=/run/secrets/google_consumer_secret
+      - TWITTER_CONSUMER_KEY_FILE=/run/secrets/twitter_consumer_key
+      - TWITTER_CONSUMER_SECRET_FILE=/run/secrets/twitter_consumer_secret
+      - TWITTER_ACCESS_TOKEN_FILE=/run/secrets/twitter_token
+      - TWITTER_ACCESS_TOKEN_SECRET_FILE=/run/secrets/twitter_token_secret
+    networks:
+      - bobnet-data
+      - bobnet-ingress
+    secrets:
+      - pg_mind_password
+      - mind-email-hash-salt
+      - mind-secret-key
+      - source: mind_google_consumer_key
+        target: google_consumer_key
+      - source: mind_google_consumer_secret
+        target: google_consumer_secret
+      - source: mind_twitter_consumer_key
+        target: twitter_consumer_key
+      - source: mind_twitter_consumer_secret
+        target: twitter_consumer_secret
+      - source: mind_twitter_token
+        target: twitter_token
+      - source: mind_twitter_token_secret
+        target: twitter_token_secret
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role != dmz
+          - node.labels.role != data
+  cronjob:
+    image: robyoung/mind-cronjob:001
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role != dmz
+          - node.labels.role != data
+      restart_policy:
+        delay: 60m
+
+networks:
+  bobnet-ingress:
+    external: true
+
+  bobnet-data:
+    external: true
+
+secrets:
+  pg_mind_password:
+    external: true
+
+  mind-secret-key:
+    external: true
+
+  mind-email-hash-salt:
+    external: true
+
+  mind_google_consumer_key:
+    external: true
+
+  mind_google_consumer_secret:
+    external: true
+
+  mind_twitter_consumer_key:
+    external: true
+
+  mind_twitter_consumer_secret:
+    external: true
+
+  mind_twitter_token:
+    external: true
+
+  mind_twitter_token_secret:
+    external: true

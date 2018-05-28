@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
   web:
-    image: robyoung/bobnet-control:008
+    image: robyoung/bobnet-control:022
     command: ./scripts/run_web.sh
     environment:
       - DB_NAME=bobnet_control
@@ -12,6 +12,7 @@ services:
       - MESSAGING_HOST=rabbitmq.bobnet-messaging
       - MESSAGING_USER=rabbit
       - MESSAGING_PASS_FILE=/run/secrets/rabbit_password
+      - DEBUG=on
     networks:
       - bobnet-data
       - bobnet-ingress
@@ -26,7 +27,7 @@ services:
           - node.labels.role != data
 
   messaging:
-    image: robyoung/bobnet-control:008
+    image: robyoung/bobnet-control:022
     command: ./scripts/run_messaging.sh
     environment:
       - DB_NAME=bobnet_control
@@ -36,6 +37,7 @@ services:
       - MESSAGING_HOST=rabbitmq.bobnet-messaging
       - MESSAGING_USER=rabbit
       - MESSAGING_PASS_FILE=/run/secrets/rabbit_password
+      - DEBUG=off
     networks:
       - bobnet-data
       - bobnet-messaging
