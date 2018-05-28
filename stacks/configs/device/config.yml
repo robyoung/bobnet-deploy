@@ -1,0 +1,12 @@
+components:
+  counter:
+    type: counter
+    every: 5m
+
+controller:
+  type:      bobnet
+  is_tls:    True
+  host:      bobnet-local.robyoung.digital
+  device_id: tester01
+  username:  devices
+  password_path: /run/secrets/devices_password

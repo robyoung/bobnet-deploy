@@ -1,0 +1,25 @@
+version: "3.5"
+
+services:
+  device:
+    image: robyoung/bobnet-device:0.3.0
+    command: bobnet-device --config /etc/bobnet/config.yml
+    secrets:
+      - devices_password
+    configs:
+      - source: bobnet_config
+        target: /etc/bobnet/config.yml
+        mode: 0755
+    deploy:
+      placement:
+          constraints:
+            - node.labels.role != dmz
+            - node.labels.role != data
+
+secrets:
+  devices_password:
+    external: true
+
+configs:
+  bobnet_config:
+    file: ./configs/device/config.yml
