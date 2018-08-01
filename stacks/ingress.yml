@@ -1,6 +1,6 @@
 version: "3.5"
 services:
-  proxy:
+  ingress:
     image: robyoung/bobnet-proxy:021
     environment:
       - BUMPER=1
@@ -18,8 +18,10 @@ services:
       - bobnet-messaging
     secrets:
       - bobnet-ca.pem
-      - bobnet-local-fullchain
-      - bobnet-local-privkey
+      - source: bobnet-local-fullchain2
+        target: bobnet-local-fullchain
+      - source: bobnet-local-privkey2
+        target: bobnet-local-privkey
       - source: bobnet-fullchain-0001
         target: bobnet-fullchain
       - source: bobnet-privkey-0001
@@ -36,10 +38,10 @@ secrets:
   bobnet-ca.pem:
     external: true
 
-  bobnet-local-fullchain:
+  bobnet-local-fullchain2:
     external: true
 
-  bobnet-local-privkey:
+  bobnet-local-privkey2:
     external: true
 
   bobnet-fullchain-0001:
