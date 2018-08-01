@@ -9,18 +9,15 @@ services:
       - "1883:1883"    # MQTT non-TLS
       - "15672:15672"  # UI non-TLS
       - "5672:5672"    # AMQP non-TLS
-
-      # - "8883:8883"    # MQTT TLS
-      # - "15671:15671"  # UI TLS
-      # - "5671:5671"    # AMQP TLS
     networks:
       - bobnet-messaging
     secrets:
       - rabbit_password
     deploy:
       placement:
-        constraints:
-          - node.labels.role == dmz
+          constraints:
+            - node.labels.role != dmz
+            - node.labels.role != data
   setup:
     image: robyoung/rabbitmq-setup:001
     networks:
@@ -30,8 +27,9 @@ services:
       - devices_password
     deploy:
       placement:
-        constraints:
-          - node.labels.role == dmz
+          constraints:
+            - node.labels.role != dmz
+            - node.labels.role != data
       restart_policy:
         condition: on-failure
         delay: 5s
