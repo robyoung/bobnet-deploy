@@ -1,0 +1,46 @@
+version: "3.5"
+
+services:
+  web:
+    image: robyoung/money:2525c9b
+    command: ./run.sh
+    environment:
+      - DB_NAME=money
+      - DB_USER=money
+      - DB_PASSWORD_FILE=/run/secrets/pg_money_password
+      - DB_HOST=postgres.bobnet-data
+      - FLASK_APP=money.entrypoint
+      - ENVIRONMENT=prod
+      - FLASK_SECRET_KEY_FILE=/run/secrets/money_secret_key
+      - MONZO_CLIENT_ID_FILE=/run/secrets/money_monzo_client_id
+      - MONZO_CLIENT_SECRET_FILE=/run/secrets/money_monzo_client_secret
+    networks:
+      - bobnet-data
+      - bobnet-ingress
+    secrets:
+      - pg_money_password
+      - money_secret_key
+      - money_monzo_client_id
+      - money_monzo_client_secret
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role != dmz
+          - node.labels.role != data
+
+networks:
+  bobnet-ingress:
+    external: true
+
+  bobnet-data:
+    external: true
+    
+secrets:
+  pg_money_password:
+    external: true
+  money_secret_key:
+    external: true
+  money_monzo_client_id:
+    external: true
+  money_monzo_client_secret:
+    external: true
