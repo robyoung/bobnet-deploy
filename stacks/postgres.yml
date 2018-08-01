@@ -8,6 +8,34 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD_FILE=/run/secrets/pg_password
+      - POSTGRES_DATABASES=mind bobnet_control
+      - POSTGRES_MIND_PASSWORD_FILE=/run/secrets/pg_mind_password
+      - POSTGRES_BOBNET_CONTROL_PASSWORD_FILE=/run/secrets/pg_bobnet_control_password
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role == data
+    networks:
+      - bobnet-data
+    secrets:
+      - pg_password
+      - pg_mind_password
+      - pg_bobnet_control_password
+    configs:
+      - source: init_databases
+        target: /docker-entrypoint-initdb.d/init-databases.sh
+        mode: 0755
+
+  backup:
+    image: arm32v7/postgres:10
+    command: /backup.sh
+    volumes:
+      - "/mnt/data/backups/postgres:/var/backups/postgres"
+    environment:
+      - POSTGRES_HOST=postgres.bobnet-data
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/pg_password
+      - BACKUP_BASE=/var/backups/postgres
     deploy:
       placement:
         constraints:
@@ -17,8 +45,30 @@ services:
     secrets:
       - pg_password
     configs:
-      - source: init_databases
-        target: /docker-entrypoint-initdb.d/init-databases.sh
+      - source: backup
+        target: /backup.sh
+        mode: 0755
+
+  upload:
+    image: arm32v6/python:3.6-alpine3.7
+    command: /upload.sh
+    volumes:
+      - "/mnt/data/backups/postgres:/var/backups/postgres"
+    environment:
+      - BACKUP_BASE=/var/backups/postgres
+      - BACKUP_BUCKET=bobnet-backups
+      - AWS_ACCESS_KEY_ID_FILE=/run/secrets/aws_backup_key_id
+      - AWS_SECRET_ACCESS_KEY_FILE=/run/secrets/aws_backup_secret
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role == data
+    secrets:
+      - aws_backup_key_id
+      - aws_backup_secret
+    configs:
+      - source: upload
+        target: /upload.sh
         mode: 0755
 
 networks:
@@ -28,7 +78,19 @@ networks:
 secrets:
   pg_password:
     external: true
+  pg_mind_password:
+    external: true
+  pg_bobnet_control_password:
+    external: true
+  aws_backup_key_id:
+    external: true
+  aws_backup_secret:
+    external: true
 
 configs:
   init_databases:
     file: ./configs/postgres/init_databases.sh
+  backup:
+    file: ./configs/postgres/backup.sh
+  upload:
+    file: ./configs/postgres/upload.sh
